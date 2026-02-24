@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>T-konta (frontend + Python API)</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#0f172a; color:#e5e7eb; margin:0; padding:20px; }
+    .wrap { max-width: 1100px; margin: 0 auto; display:grid; gap:14px; }
+    .card { background:#111827; border:1px solid #334155; border-radius:10px; padding:14px; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    input, select, button { padding:8px 10px; border-radius:8px; border:1px solid #334155; background:#0b1220; color:#e5e7eb; }
+    button { cursor:pointer; }
+    .danger { background:#7f1d1d; }
+    .list button.active { background:#14532d; }
+    .list { display:flex; gap:6px; flex-wrap:wrap; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { border-bottom:1px solid #334155; padding:8px; text-align:left; }
+    .muted { color:#9ca3af; }
+    .error { color:#fca5a5; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2>Konta</h2>
+      <div class="row">
+        <input id="newAccountName" placeholder="Nazwa nowego konta" />
+        <button id="addAccountBtn">Dodaj konto</button>
+      </div>
+      <div id="accountsList" class="list" style="margin-top:10px"></div>
+      <p class="muted">Kliknij konto, aby je wybrać.</p>
+    </div>
+
+    <div class="card">
+      <h2 id="accountTitle">Wybrane konto</h2>
+      <div class="row">
+        <input id="renameAccountInput" placeholder="Nowa nazwa konta" />
+        <button id="renameAccountBtn">Zmień nazwę</button>
+        <button id="deleteAccountBtn" class="danger">Usuń konto</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Dodaj zapis</h2>
+      <div class="row">
+        <select id="entrySide">
+          <option value="W">Winien</option>
+          <option value="M">Ma</option>
+        </select>
+        <input id="entryAmount" placeholder="Kwota, np. 10,50" />
+        <button id="addEntryBtn">Dodaj zapis</button>
+      </div>
+      <p id="msg" class="error"></p>
+    </div>
+
+    <div class="card">
+      <h2>Zapisy</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Strona</th><th>Kwota</th><th>Akcje</th></tr>
+        </thead>
+        <tbody id="entriesBody"></tbody>
+      </table>
+      <p id="summary"></p>
+    </div>
+  </div>
+
+  <script>
+    let state = { konta: [] };
+    let selectedAccountId = null;
+
+    const accountsList = document.getElementById('accountsList');
+    const accountTitle = document.getElementById('accountTitle');
+    const renameAccountInput = document.getElementById('renameAccountInput');
+    const entriesBody = document.getElementById('entriesBody');
+    const summary = document.getElementById('summary');
+    const msg = document.getElementById('msg');
+
+    async function api(path, method = 'GET', body = null) {
+      const resp = await fetch(path, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: body ? JSON.stringify(body) : null
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        throw new Error(data.error || 'Błąd API');
+      }
+      return data;
+    }
+
+    function selectedAccount() {
+      return state.konta.find(k => k.id === selectedAccountId) || null;
+    }
+
+    function render() {
+      accountsList.innerHTML = '';
+      state.konta.forEach(k => {
+        const btn = document.createElement('button');
+        btn.textContent = `${k.nazwa} (#${k.id})`;
+        if (k.id === selectedAccountId) btn.classList.add('active');
+        btn.onclick = () => { selectedAccountId = k.id; render(); };
+        accountsList.appendChild(btn);
+      });
+
+      const konto = selectedAccount();
+      if (!konto) {
+        accountTitle.textContent = 'Brak wybranego konta';
+        entriesBody.innerHTML = '';
+        summary.textContent = '';
+        return;
+      }
+
+      accountTitle.textContent = `Wybrane konto: ${konto.nazwa}`;
+      entriesBody.innerHTML = '';
+
+      konto.zapisy.forEach(z => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${z.id}</td>
+          <td>${z.strona === 'W' ? 'Winien' : 'Ma'}</td>
+          <td>${z.kwota}</td>
+          <td>
+            <button data-edit="${z.id}">Popraw</button>
+            <button data-del="${z.id}" class="danger">Usuń</button>
+          </td>
+        `;
+        entriesBody.appendChild(tr);
+      });
+
+      summary.textContent = `Suma Winien: ${konto.suma_winien} | Suma Ma: ${konto.suma_ma} | Saldo: ${konto.saldo}`;
+
+      entriesBody.querySelectorAll('[data-del]').forEach(btn => {
+        btn.onclick = async () => {
+          await api(`/api/accounts/${konto.id}/entries/${btn.dataset.del}`, 'DELETE');
+          await refresh();
+        };
+      });
+
+      entriesBody.querySelectorAll('[data-edit]').forEach(btn => {
+        btn.onclick = async () => {
+          const zapis = konto.zapisy.find(z => String(z.id) === btn.dataset.edit);
+          const newSide = prompt('Strona (W/M):', zapis.strona);
+          if (!newSide) return;
+          const newAmount = prompt('Kwota:', zapis.kwota);
+          if (!newAmount) return;
+          await api(`/api/accounts/${konto.id}/entries/${zapis.id}`, 'PUT', { side: newSide.toUpperCase(), amount: newAmount });
+          await refresh();
+        };
+      });
+    }
+
+    async function refresh() {
+      state = await api('/api/state');
+      if (!selectedAccountId && state.konta.length) {
+        selectedAccountId = state.konta[0].id;
+      }
+      if (selectedAccountId && !state.konta.find(k => k.id === selectedAccountId)) {
+        selectedAccountId = state.konta[0]?.id ?? null;
+      }
+      render();
+    }
+
+    document.getElementById('addAccountBtn').onclick = async () => {
+      msg.textContent = '';
+      try {
+        const name = document.getElementById('newAccountName').value;
+        const created = await api('/api/accounts', 'POST', { name });
+        document.getElementById('newAccountName').value = '';
+        selectedAccountId = created.id;
+        await refresh();
+      } catch (e) {
+        msg.textContent = e.message;
+      }
+    };
+
+    document.getElementById('renameAccountBtn').onclick = async () => {
+      const konto = selectedAccount();
+      if (!konto) return;
+      msg.textContent = '';
+      try {
+        await api(`/api/accounts/${konto.id}`, 'PUT', { name: renameAccountInput.value });
+        renameAccountInput.value = '';
+        await refresh();
+      } catch (e) {
+        msg.textContent = e.message;
+      }
+    };
+
+    document.getElementById('deleteAccountBtn').onclick = async () => {
+      const konto = selectedAccount();
+      if (!konto) return;
+      await api(`/api/accounts/${konto.id}`, 'DELETE');
+      await refresh();
+    };
+
+    document.getElementById('addEntryBtn').onclick = async () => {
+      const konto = selectedAccount();
+      if (!konto) {
+        msg.textContent = 'Najpierw dodaj i wybierz konto.';
+        return;
+      }
+      msg.textContent = '';
+      try {
+        await api(`/api/accounts/${konto.id}/entries`, 'POST', {
+          side: document.getElementById('entrySide').value,
+          amount: document.getElementById('entryAmount').value,
+        });
+        document.getElementById('entryAmount').value = '';
+        await refresh();
+      } catch (e) {
+        msg.textContent = e.message;
+      }
+    };
+
+    refresh();
+  </script>
+</body>
+</html>
