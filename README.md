@@ -1,36 +1,23 @@
 # Program do T-kont
 
-Teraz aplikacja działa w modelu:
+Prosty program konsolowy w Pythonie do prowadzenia jednego konta w układzie T (Winien / Ma).
 
-- `index.html` — frontend (formularz i widok),
-- `app.py` + `t_konta.py` — backend i silnik logiki w Pythonie.
+## Funkcje
 
-## Co można robić w wersji web
+- dodawanie zapisów po stronie **Winien**,
+- dodawanie zapisów po stronie **Ma**,
+- wyświetlanie konta T z sumami,
+- wyliczanie salda końcowego.
 
-- dodać konto,
-- zmienić nazwę konta,
-- usunąć konto,
-- dodać zapis Winien/Ma,
-- poprawić zapis,
-- usunąć zapis,
-- podglądać sumy i saldo.
-
-## Uruchomienie wersji web (zalecane)
-
-```bash
-python3 app.py
-```
-
-Następnie otwórz:
-
-```text
-http://localhost:8000
-```
-
-## Wersja CLI
-
-Nadal dostępna:
+## Uruchomienie
 
 ```bash
 python3 t_konta.py
 ```
+
+## Przykładowy przebieg
+
+1. Podaj nazwę konta (np. `Kasa`).
+2. Dodaj kilka zapisów po stronie Winien i Ma.
+3. Wybierz opcję wyświetlenia konta.
+4. Sprawdź saldo końcowe.
