@@ -6,10 +6,24 @@
   <title>T-konta (frontend + Python API)</title>
   <style>
     body { font-family: Arial, sans-serif; background:#0f172a; color:#e5e7eb; margin:0; padding:20px; }
-    .wrap { max-width: 1100px; margin: 0 auto; display:grid; gap:14px; }
+    .layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+      gap: 14px;
+      min-height: calc(100vh - 40px);
+    }
+    .left-panel,
+    .right-panel {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
     .card { background:#111827; border:1px solid #334155; border-radius:10px; padding:14px; }
     .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     input, select, button { padding:8px 10px; border-radius:8px; border:1px solid #334155; background:#0b1220; color:#e5e7eb; }
+    input, select { flex: 1 1 170px; }
     button { cursor:pointer; }
     .danger { background:#7f1d1d; }
     .list button.active { background:#14532d; }
@@ -18,52 +32,59 @@
     th, td { border-bottom:1px solid #334155; padding:8px; text-align:left; }
     .muted { color:#9ca3af; }
     .error { color:#fca5a5; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h2>Konta</h2>
-      <div class="row">
-        <input id="newAccountName" placeholder="Nazwa nowego konta" />
-        <button id="addAccountBtn">Dodaj konto</button>
+  <div class="layout">
+    <section class="left-panel">
+      <div class="card">
+        <h2>Konta</h2>
+        <div id="accountsList" class="list" style="margin-top:10px"></div>
+        <p class="muted">Po lewej widzisz wszystkie konta. Kliknij konto, aby je wybrać.</p>
       </div>
-      <div id="accountsList" class="list" style="margin-top:10px"></div>
-      <p class="muted">Kliknij konto, aby je wybrać.</p>
-    </div>
 
-    <div class="card">
-      <h2 id="accountTitle">Wybrane konto</h2>
-      <div class="row">
-        <input id="renameAccountInput" placeholder="Nowa nazwa konta" />
-        <button id="renameAccountBtn">Zmień nazwę</button>
-        <button id="deleteAccountBtn" class="danger">Usuń konto</button>
+      <div class="card">
+        <h2 id="accountTitle">Wybrane konto</h2>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Strona</th><th>Kwota</th><th>Akcje</th></tr>
+          </thead>
+          <tbody id="entriesBody"></tbody>
+        </table>
+        <p id="summary"></p>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <h2>Dodaj zapis</h2>
-      <div class="row">
-        <select id="entrySide">
-          <option value="W">Winien</option>
-          <option value="M">Ma</option>
-        </select>
-        <input id="entryAmount" placeholder="Kwota, np. 10,50" />
-        <button id="addEntryBtn">Dodaj zapis</button>
+    <aside class="right-panel">
+      <div class="card">
+        <h2>Opcje konta</h2>
+        <div class="row">
+          <input id="newAccountName" placeholder="Nazwa nowego konta" />
+          <button id="addAccountBtn">Dodaj konto</button>
+        </div>
+        <div class="row">
+          <input id="renameAccountInput" placeholder="Nowa nazwa konta" />
+          <button id="renameAccountBtn">Zmień nazwę</button>
+          <button id="deleteAccountBtn" class="danger">Usuń konto</button>
+        </div>
       </div>
-      <p id="msg" class="error"></p>
-    </div>
 
-    <div class="card">
-      <h2>Zapisy</h2>
-      <table>
-        <thead>
-          <tr><th>ID</th><th>Strona</th><th>Kwota</th><th>Akcje</th></tr>
-        </thead>
-        <tbody id="entriesBody"></tbody>
-      </table>
-      <p id="summary"></p>
-    </div>
+      <div class="card">
+        <h2>Dodaj zapis</h2>
+        <div class="row">
+          <select id="entrySide">
+            <option value="W">Winien</option>
+            <option value="M">Ma</option>
+          </select>
+          <input id="entryAmount" placeholder="Kwota, np. 10,50" />
+          <button id="addEntryBtn">Dodaj zapis</button>
+        </div>
+        <p id="msg" class="error"></p>
+      </div>
+    </aside>
   </div>
 
   <script>
