@@ -11,6 +11,7 @@ import json
 import re
 from io import BytesIO
 from zipfile import ZIP_DEFLATED, ZipFile
+from xml.etree import ElementTree as ET
 from xml.sax.saxutils import escape, unescape
 
 
@@ -45,6 +46,59 @@ def _operation_marker(entry: dict, side: str) -> str:
     """Zapis jak w ręcznym koncie T: 9a) po Wn i (9a po Ma."""
     number = str(entry.get("numer_operacji", "")).strip()
     return f"{number})" if side == "W" else f"({number}"
+
+
+def _account_title(account: dict) -> str:
+    """Widoczny nagłówek konta: numer oraz nazwa, jak w zeszycie ćwiczeń."""
+    number = str(account.get("numer", "")).strip()
+    name = str(account.get("nazwa", "")).strip()
+    return " ".join(part for part in (number, name) if part)
+
+
+def _account_title_cells(accounts: list[dict]) -> list[tuple[dict, str]]:
+    """Zwraca komórki nagłówków w tym samym układzie, co generator arkusza."""
+    cells: list[tuple[dict, str]] = []
+    current_row = 2
+    for group_start in range(0, len(accounts), 3):
+        group = accounts[group_start : group_start + 3]
+        group_depth = max(
+            4,
+            *(max(
+                len([entry for entry in account.get("zapisy", []) if entry.get("strona") == "W"]),
+                len([entry for entry in account.get("zapisy", []) if entry.get("strona") == "M"]),
+            ) for account in group),
+        )
+        for position, account in enumerate(group):
+            cells.append((account, _cell_ref(current_row, 2 + position * 5)))
+        current_row += group_depth + 2
+    return cells
+
+
+def _visible_account_numbers(archive: ZipFile, accounts: list[dict]) -> dict[int, str]:
+    """Odczytuje ręcznie poprawiony numer z widocznego nagłówka arkusza XLSX."""
+    try:
+        root = ET.fromstring(archive.read("xl/worksheets/sheet1.xml"))
+    except (KeyError, ET.ParseError):
+        return {}
+
+    namespace = {"x": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+    values: dict[str, str] = {}
+    for cell in root.findall(".//x:c", namespace):
+        reference = cell.get("r")
+        text_node = cell.find(".//x:t", namespace)
+        if reference and text_node is not None and text_node.text is not None:
+            values[reference] = text_node.text.strip()
+
+    overrides: dict[int, str] = {}
+    for account, reference in _account_title_cells(accounts):
+        visible_title = values.get(reference, "")
+        name = str(account.get("nazwa", "")).strip()
+        match = re.fullmatch(rf"(.+?)\s+{re.escape(name)}", visible_title) if name else None
+        if match:
+            number = match.group(1).strip()
+            if number:
+                overrides[id(account)] = number
+    return overrides
 
 
 def _entry_tone(account: dict, side: str) -> str:
@@ -101,7 +155,7 @@ def _sheet_xml(accounts: list[dict]) -> str:
                 start_column + 2,
                 start_column + 3,
             )
-            title = str(account.get("nazwa", "")).strip()
+            title = _account_title(account)
             rows.setdefault(current_row, []).append(_text_cell(current_row, debit_col, title, 1))
             rows[current_row].append(_blank_cell(current_row, credit_col, 1))
             merges.append(f"{_cell_ref(current_row, debit_col)}:{_cell_ref(current_row, credit_col)}")
@@ -293,4 +347,12 @@ def read_xlsx_state(file_bytes: bytes) -> dict:
         raise ValueError("Dane ćwiczenia w pliku XLSX są uszkodzone.") from exc
     if state.get("format") != "kontownik-t-v2":
         raise ValueError("To nie jest plik ćwiczenia wyeksportowany z aktualnego Kontownika.")
+    try:
+        with ZipFile(BytesIO(file_bytes)) as archive:
+            visible_numbers = _visible_account_numbers(archive, state.get("konta", []))
+    except Exception:
+        visible_numbers = {}
+    for account in state.get("konta", []):
+        if id(account) in visible_numbers:
+            account["numer"] = visible_numbers[id(account)]
     return state
