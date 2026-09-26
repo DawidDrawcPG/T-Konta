@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>T-konta</title>
+  <style>
+    :root {
+      --ink:#003b70; --muted:#64748b; --line:#cfd9e4; --soft:#f4f8fb; --panel:#fff;
+      --blue:#1f4f7a; --blue2:#173c5d; --blue-soft:#eef4f8; --green:#16875b;
+      --increase:#16875b; --increase-soft:#e9f8f1; --decrease:#c23b45; --decrease-soft:#fff0f1;
+      --green-soft:#e7fbf2; --red:#ea3346; --red-soft:#fff0f1; --amber:#da8700;
+      --amber-soft:#fff6df; --icon-navy:#004b87; --shadow:none;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:#fff;color:var(--ink);font:15px/1.5 Arial,sans-serif}
+    button,input,select{font:inherit;color:inherit} button{cursor:pointer}
+    .topbar{height:86px;background:#fff;border-top:4px solid #003b70;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 54px;position:sticky;top:0;z-index:20}
+    .brand{display:flex;align-items:center;white-space:nowrap}.faculty-logo{width:318px;height:auto;max-height:58px;object-fit:contain}
+    .logo{width:42px;height:42px;border-radius:0;background:var(--icon-navy);display:grid;place-items:center;color:white}
+    .logo svg{width:25px}.nav{display:flex;align-items:center;gap:8px;flex:1}
+    .nav-btn{border:0;background:transparent;padding:11px 16px;border-radius:0;color:#334b76;display:flex;gap:9px;align-items:center;font-weight:700}
+    .nav-btn.active{color:var(--blue);background:var(--blue-soft)} .nav-btn:hover{background:#f2f6fb}
+    .nav-icon{font-size:19px}.top-search{width:min(290px,22vw);height:44px;border:1px solid #b9c9d8;background:#fff;border-radius:0;padding:0 14px 0 40px;outline:none}.top-search:focus{border-color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+    .top-search-wrap{position:relative;margin-left:auto}.top-search-wrap .icon{position:absolute;left:13px;top:12px;color:var(--icon-navy);width:20px;height:20px}
+    .workspace{padding:38px 54px;max-width:1680px;margin:auto}.two-col{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:30px}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:0;box-shadow:var(--shadow)}
+    .main-panel{padding:30px}.side-panel{padding:26px}.hero{display:flex;align-items:center;gap:20px;margin-bottom:28px}
+    .t-icon{width:54px;height:54px;background:#eef4f8;border-radius:0;display:grid;place-items:center;font-size:24px;font-weight:700;flex:none}
+    h1{font-size:28px;line-height:1.25;margin:0 0 6px;letter-spacing:0;text-transform:uppercase;font-weight:700} h2{font-size:20px;line-height:1.3;margin:0;font-weight:700} h3{font-size:16px;line-height:1.35;margin:0;font-weight:700}.subtitle{margin:0;color:var(--muted);font-size:15px}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}.metric{border:1px solid var(--line);border-radius:0;padding:14px;display:flex;align-items:center;gap:13px;min-height:84px}
+    .metric-icon{width:48px;height:48px;border-radius:0;background:#edf4f9;color:var(--icon-navy);display:grid;place-items:center}.metric-icon.green{background:#edf4f9;color:var(--icon-navy)}
+    .icon{width:21px;height:21px;display:inline-block;flex:none;fill:none;stroke:currentColor;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round}.metric-icon .icon{width:26px;height:26px;stroke-width:2.9}.primary .icon{color:#fff}.secondary .icon{color:#1f4f7a}.danger-btn .icon,.row-edit .icon,.tiny-link .icon{color:var(--icon-navy)}.svg-sprite{position:absolute;width:0;height:0;overflow:hidden}
+    .metric-label{color:#58709a;margin-bottom:3px;font-size:13px}.metric-value{font-size:21px;font-weight:700;letter-spacing:0}.metric-value.increase{color:var(--increase)}.metric-value.decrease{color:var(--decrease)}
+    .field-shell{position:relative}.field-shell .glass{position:absolute;left:16px;top:8px;font-size:24px;color:#6480ad}
+    .control{width:100%;height:54px;border:1px solid #c7d4e1;border-radius:0;background:#fff;padding:0 16px;outline:none}.field-shell .control{padding-left:50px}.control:focus{border-color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+    .primary,.secondary,.danger-btn{height:46px;border-radius:0;border:1px solid transparent;padding:0 18px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:700}
+    .primary{background:var(--blue);color:#fff;box-shadow:none}.primary:hover{background:var(--blue2)}
+    .secondary{background:#fff;border-color:#1f4f7a;color:#1f4f7a}.secondary:hover{background:#eef4f8}.danger-btn{background:#fff;color:#b4232c;border-color:#d99096}
+    .accounts-grid{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px}.account-card{border:1px solid var(--line);background:#fff;border-radius:0;padding:18px;text-align:left}.account-open{display:block;width:100%;border:0;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer}
+    .account-card:hover{border-color:#005ca9;box-shadow:inset 4px 0 0 #005ca9}.account-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}.account-number{font-size:22px;font-weight:800}.account-name{font-size:15px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .badge{font-size:12px;font-weight:700;border-radius:0;padding:5px 9px;background:var(--green-soft);color:var(--green)}.badge.result{background:var(--amber-soft);color:var(--amber)}.badge.closed{background:#e9edf3;color:#546579}
+    .account-sums{display:grid;grid-template-columns:1fr 1fr;background:#f4f7fb;border:1px solid #e0e8ef;border-radius:0;margin-bottom:13px}.sum-cell{text-align:center;padding:7px;border-right:1px solid #dbe4ef}.sum-cell:last-child{border:0}.sum-label{display:block;color:#536b92;font-size:12px}.sum-value{display:block;font-size:16px;font-weight:750;margin-top:4px}.increase{color:var(--increase)!important}.decrease{color:var(--decrease)!important}.neutral{color:#526b96!important}
+    .balance-line{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:11px;color:#526b96}.balance-line strong{font-size:18px}.account-entry-preview{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}.entry-preview-title{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#526b96;margin-bottom:7px}.entry-preview-head,.entry-preview-row{display:grid;grid-template-columns:42px 30px minmax(0,1fr) 76px;gap:6px;align-items:center}.entry-preview-head{padding:0 0 5px;color:#6c80a1;font-size:10px;border-bottom:1px solid #e5edf4}.entry-preview-row{min-height:30px;font-size:11px;color:#345076;border-bottom:1px solid #edf2f7}.entry-preview-row:last-child{border-bottom:0}.entry-preview-row span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.entry-preview-side{font-weight:800;text-align:center}.entry-preview-side.zwiekszenie{color:var(--increase)}.entry-preview-side.zmniejszenie{color:var(--decrease)}.entry-preview-amount{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}.account-entries-scroll{max-height:186px;overflow-y:auto;padding-right:3px}.entry-preview-empty{font-size:12px;color:var(--muted);padding:5px 0}
+    .side-title{font-size:24px;margin-bottom:20px}.action-stack{display:grid;gap:12px}.section-rule{height:1px;background:var(--line);margin:26px 0 20px}.recent-list{margin-top:12px}.recent-item{display:grid;grid-template-columns:58px minmax(0,1fr);column-gap:12px;row-gap:4px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);color:#37517e}.recent-number{grid-row:1/3;font-weight:800;background:#f1f5fb;padding:8px;border-radius:0;text-align:center;color:var(--ink)}.recent-name{font-weight:700;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.recent-type{justify-self:start;color:#48668b;font-size:11px;line-height:1.1;background:#edf4f9;border-left:3px solid var(--blue);padding:3px 7px}.recent-item:hover .recent-name{color:var(--blue)}.empty{grid-column:1/-1;padding:50px;text-align:center;color:var(--muted)}
+    .detail-hero{display:flex;align-items:center;margin-bottom:30px}.detail-hero .t-icon{width:48px;height:48px;font-size:22px}.detail-title{margin-left:16px}.detail-title h1{font-size:24px}.meta{color:#60769a;margin-top:5px;font-size:14px}.hero-action{margin-left:auto;height:42px}
+    .ledger-labels{display:grid;grid-template-columns:1fr 1fr;gap:0;font-size:18px;font-weight:800;margin:0 8px 8px}.ledger-labels span:first-child{color:#253d64}.ledger-labels span:last-child{padding-left:28px;color:#253d64}
+    .ledger{display:grid;grid-template-columns:1fr 1fr;border-top:4px solid #102448;min-height:520px}.ledger-side{padding:14px 8px 0}.ledger-side:first-child{border-right:4px solid #102448}.ledger-side:last-child{padding-left:12px}
+    .ledger-head,.ledger-row{display:grid;grid-template-columns:36px 98px minmax(150px,1fr) 120px 36px;align-items:center}.ledger-head{height:43px;background:#f0f5fb;border-radius:0;color:#536989;font-size:13px}.ledger-head span{padding:0 8px}.ledger-row{min-height:46px;border-bottom:1px dashed #dce5f0;color:#253d64;font-size:13px}.ledger-row>span{padding:7px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ledger-row.empty-row{color:#a9b7ca}.ledger-row:hover:not(.empty-row){background:#f8fbff}.ledger-check{accent-color:var(--blue)}.ledger-row.zwiekszenie>span:nth-child(2),.ledger-row.zwiekszenie>span:nth-child(4){color:var(--increase);font-weight:700}.ledger-row.zmniejszenie>span:nth-child(2),.ledger-row.zmniejszenie>span:nth-child(4){color:var(--decrease);font-weight:700}
+    .row-edit{border:0;background:transparent;color:var(--icon-navy);font-size:17px;padding:4px}.ledger-total{height:54px;margin-top:18px;background:#edf4fb;border-radius:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-weight:750;font-size:16px}.ledger-total.zwiekszenie{background:var(--increase-soft)}.ledger-total.zmniejszenie{background:var(--decrease-soft)}.saldo-bar{height:66px;border:1px solid #c7d4e1;border-radius:0;margin-top:14px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:18px;font-weight:800}.saldo-pill{background:#eef3fa;border-radius:0;padding:10px 18px;font-size:20px}.saldo-pill.zwiekszenie{background:var(--increase-soft);color:var(--increase)}.saldo-pill.zmniejszenie{background:var(--decrease-soft);color:var(--decrease)}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:12px}.gear{width:38px;height:38px;border:1px solid var(--line);background:#fff;border-radius:0}.props{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}.props .wide{grid-column:1/-1}.label{display:block;font-size:12px;margin-bottom:6px;color:#304970}.small-control{width:100%;height:40px;border:1px solid #c7d4e1;border-radius:0;padding:0 10px;background:#fff}.recent-entry{display:grid;grid-template-columns:72px 1fr 36px 82px;gap:7px;align-items:center;padding:8px 0;border-bottom:1px solid #e8eef6;font-size:12px}.side-tag{border-radius:0;padding:3px 7px;background:#edf3fa;color:#526b96;text-align:center}.amount{text-align:right;font-weight:700}.recent-entry.zwiekszenie .amount{color:var(--increase)}.recent-entry.zmniejszenie .amount{color:var(--decrease)}.tiny-link{border:0;background:none;color:var(--blue);float:right}.bottom-action{width:100%;height:42px;margin-top:14px}.operation-check{border-bottom:1px solid #e8eef6;padding:10px 0;font-size:13px}.operation-check:last-child{border:0}.operation-check strong{display:block}.status{display:inline-block;margin-top:4px;border-radius:0;padding:3px 7px;font-size:12px;font-weight:700}.status.ok{background:var(--increase-soft);color:var(--increase)}.status.problem{background:var(--decrease-soft);color:var(--decrease)}.opening-note{font-size:12px;color:#60769a;margin-top:7px}
+    .hidden{display:none!important}.toast{position:fixed;right:24px;bottom:24px;background:#102448;color:white;padding:12px 16px;border-radius:0;border-left:4px solid #fff;z-index:60;max-width:360px;font-size:14px}.toast.error{background:#b52032}
+    dialog{border:1px solid #b9c9d8;border-top:4px solid var(--ink);border-radius:0;padding:0;box-shadow:0 8px 24px rgba(18,42,78,.18);width:min(560px,calc(100vw - 30px));color:var(--ink)}dialog::backdrop{background:rgba(8,21,54,.42)}
+    .modal{padding:24px 26px 22px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin:-24px -26px 22px;padding:16px 26px 14px;border-bottom:1px solid var(--line);background:#f8fbfd}.modal-head h2{font-size:20px;color:var(--ink)}.modal-close{border:1px solid #c7d4e1;background:#fff;border-radius:0;width:34px;height:34px;font-size:20px;line-height:1;color:var(--ink)}.modal-close:hover{background:#edf4f9;color:var(--blue)}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.form-grid .wide{grid-column:1/-1}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}.modal-actions button{height:42px}.switch-line{display:flex;align-items:center;gap:10px;margin-top:8px}
+    .ris-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px}.ris-card{border:1px solid var(--line);border-radius:0;padding:18px}.ris-card h3{margin-bottom:8px}.ris-card p{color:var(--muted);margin:0}.ris-list{margin-top:18px}.ris-row{display:grid;grid-template-columns:90px 1fr 140px;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}.ris-row:last-child{border-bottom:0}.ris-state{font-weight:700;text-align:right}.ris-state.ready{color:var(--increase)}.ris-state.waiting{color:var(--amber)}
+    @media(max-width:1250px){.accounts-grid{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:minmax(0,1fr) 300px}.nav-btn span:last-child{display:none}.topbar{gap:18px}.metrics{grid-template-columns:repeat(2,1fr)}.ledger-head,.ledger-row{grid-template-columns:30px 84px minmax(110px,1fr) 100px 32px}}
+    @media(max-width:920px){.topbar{padding:0 15px}.faculty-logo{width:235px}.nav{display:none}.top-search{width:210px}.two-col{grid-template-columns:1fr}.metrics{grid-template-columns:1fr}.accounts-grid{grid-template-columns:1fr}.ris-summary{grid-template-columns:1fr}.ledger{grid-template-columns:1fr}.ledger-side:first-child{border-right:0;border-bottom:4px solid #102448;padding-bottom:18px}.ledger-labels{display:none}.main-panel{padding:18px}.workspace{padding:12px}.side-panel{order:2}.detail-hero{align-items:flex-start}.hero-action{margin-left:auto}}
+    @media(max-width:620px){.top-search-wrap{display:none}.faculty-logo{width:218px}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.ledger-head,.ledger-row{grid-template-columns:26px 70px minmax(90px,1fr) 84px 28px;font-size:11px}.metric-value{font-size:20px}}
+  </style>
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-folder" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M3 5.5A2.5 2.5 0 0 1 5.5 3h4l2.1 2.4H19A2 2 0 0 1 21 7.4v10.1a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5Z"/><path stroke="#fff" stroke-width="1.8" d="M3.5 9h17"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><path stroke="#fff" stroke-width="2.5" d="m8 12 2.5 2.5L16.5 9"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M7 4h2.1A3.2 3.2 0 0 1 12 2.2 3.2 3.2 0 0 1 14.9 4H17a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><rect x="9" y="3.3" width="6" height="3" rx="1" fill="#fff" stroke="none"/><path stroke="#fff" stroke-width="1.9" d="M9 12h6M9 16h4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M5 10h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.35" fill="#fff" stroke="none"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4 4 4M4 14v6h16v-6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 18v2h16v-2"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 8V4m0 0h4M4 4l3 3a8 8 0 1 1-1.5 8"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h12l3 3v15H5Z"/><path d="M8 3v6h8V3m-8 17v-6h8v6"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m14 6-6 6 6 6M8 12h12"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="m4 20 4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10Z"/><path d="m13.5 8.5 3 3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></symbol>
+  </svg>
+  <header class="topbar">
+    <div class="brand"><img class="faculty-logo" src="assets/pg-wzie-granat.png" alt="Politechnika Gdańska — Wydział Zarządzania i Ekonomii" /></div>
+    <div class="top-search-wrap"><svg class="icon"><use href="#i-search"/></svg><input class="top-search" id="globalSearch" placeholder="Szukaj konta..." /></div>
+  </header>
+
+  <main class="workspace">
+    <section id="dashboardView" class="two-col">
+      <div class="panel main-panel">
+        <div class="hero"><div><h1>Wszystkie T-konta</h1><p class="subtitle">Przegląd i zarządzanie kontami.</p></div></div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-icon"><svg class="icon"><use href="#i-folder"/></svg></div><div><div class="metric-label">Wszystkie konta</div><div class="metric-value" id="metricAll">0</div></div></div>
+          <div class="metric"><div class="metric-icon green"><svg class="icon"><use href="#i-check"/></svg></div><div><div class="metric-label">Operacje zgodne</div><div class="metric-value" id="metricMatched">0</div></div></div>
+          <div class="metric"><div class="metric-icon"><svg class="icon"><use href="#i-clipboard"/></svg></div><div><div class="metric-label">Do uzupełnienia</div><div class="metric-value" id="metricOpen">0</div></div></div>
+          <div class="metric"><div class="metric-icon green"><svg class="icon"><use href="#i-lock"/></svg></div><div><div class="metric-label">Zamknięte konta wynikowe</div><div class="metric-value" id="metricClosed">0</div></div></div>
+        </div>
+        <div class="accounts-grid" id="accountsGrid"></div>
+      </div>
+      <aside class="panel side-panel">
+        <h2 class="side-title">Akcje</h2>
+        <div class="action-stack">
+          <button class="primary new-account"><svg class="icon"><use href="#i-plus"/></svg>Nowe konto T</button>
+          <button class="secondary" id="importBtn"><svg class="icon"><use href="#i-upload"/></svg>Importuj ćwiczenie XLSX</button>
+          <button class="secondary" id="exportBtn"><svg class="icon"><use href="#i-download"/></svg>Eksportuj do XLSX</button>
+          <button class="danger-btn" id="resetAllBtn"><svg class="icon"><use href="#i-reset"/></svg>Wyczyść i zacznij od nowa</button>
+          <input type="file" id="importFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
+        </div>
+        <div class="section-rule"></div><h2>Operacje</h2><div id="operationChecks"></div>
+        <div class="section-rule"></div><h2>Ostatnio edytowane</h2><div class="recent-list" id="recentAccounts"></div>
+      </aside>
+    </section>
+
+    <section id="risView" class="hidden"><div class="panel main-panel"><div class="hero"><div class="t-icon">R</div><div><h1>Rachunek zysków i strat</h1><p class="subtitle">Etap po ręcznym zamknięciu kont wynikowych.</p></div></div><div class="ris-summary"><div class="ris-card"><h3 id="risClosed">0 z 0 kont wynikowych zamkniętych</h3><p>Wprowadź samodzielnie zapisy zamykające na kontach kosztowych i przychodowych, w korespondencji z kontem 860. T-konta wyłącznie sprawdzają saldo 0,00 PLN i zgodność tej korespondencji.</p></div><div class="ris-card"><h3>Przejście do RZiS</h3><p>Po zamknięciu kont wynikowych zestaw ich własnoręcznie na RZiS. Nie tworzymy automatycznych dekretów ani automatycznego wyniku.</p></div></div><div class="ris-list" id="risList"></div></div></section>
+
+    <section id="accountView" class="two-col hidden">
+      <div class="panel main-panel">
+        <div class="detail-hero"><div class="detail-title"><h1 id="detailName">Konto</h1><div class="meta" id="detailMeta"></div></div><button class="secondary hero-action" id="backBtn"><svg class="icon"><use href="#i-arrow-left"/></svg>Wróć do listy kont</button></div>
+        <div class="ledger-labels"><span>Wn (Debet)</span><span>Ma (Kredyt)</span></div>
+        <div class="ledger"><div class="ledger-side" id="debitLedger"></div><div class="ledger-side" id="creditLedger"></div></div>
+        <div class="saldo-bar"><span>Saldo konta:</span><span class="saldo-pill" id="detailSaldo">0,00 PLN</span></div>
+      </div>
+      <aside class="panel side-panel">
+        <div class="panel-head"><h2>Panel roboczy</h2></div>
+        <h3>Akcje</h3><div class="action-stack" style="margin-top:12px">
+          <button class="primary" id="addEntryBtn"><svg class="icon"><use href="#i-plus"/></svg>Dodaj zapis</button>
+          <button class="danger-btn" id="deleteSelectedBtn"><svg class="icon"><use href="#i-trash"/></svg>Usuń zaznaczone</button>
+          <button class="secondary" id="saveAccountBtn"><svg class="icon"><use href="#i-save"/></svg>Zapisz zmiany</button>
+        </div>
+        <h3 style="margin-top:26px">Właściwości konta</h3>
+        <div class="props" id="accountProps">
+          <label class="wide"><span class="label">Nazwa konta</span><input class="small-control" id="propName" /></label>
+          <label><span class="label">Numer konta</span><input class="small-control" id="propNumber" /></label>
+          <label><span class="label">Typ konta</span><select class="small-control account-type" id="propType"><option>Aktywne</option><option>Pasywne</option><option>Aktywno-pasywne</option><option>Kosztowe</option><option>Kosztowe kalkulacyjne</option><option>Przychodowe</option><option>Techniczne / rozliczeniowe</option><option>Wynik finansowy</option></select></label>
+          <label><span class="label">Saldo początkowe</span><input class="small-control" id="propOpening" inputmode="decimal" /></label>
+          <label><span class="label">Strona salda początkowego</span><select class="small-control opening-side" id="propOpeningSide"><option value="W">Wn</option><option value="M">Ma</option></select><div class="opening-note" id="propOpeningNote"></div></label>
+        </div>
+        <div style="margin-top:24px"><h3>Operacje</h3><div id="operationChecksDetail"></div></div>
+        <div style="margin-top:24px"><h3 style="display:inline">Ostatnie zapisy</h3><button class="tiny-link" id="showAllEntries">Zobacz wszystkie</button><div id="recentEntries"></div></div>
+        <button class="danger-btn bottom-action" id="deleteAccountBtn">Usuń konto</button>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="accountDialog"><form method="dialog" class="modal" id="accountForm"><div class="modal-head"><h2>Nowe konto T</h2><button type="button" id="closeAccountDialog" class="modal-close" aria-label="Zamknij">×</button></div><div class="form-grid">
+    <label class="wide"><span class="label">Nazwa konta</span><input class="small-control" id="newName" required placeholder="np. Kasa" /></label>
+    <label><span class="label">Numer konta</span><input class="small-control" id="newNumber" required placeholder="np. 101" /></label>
+    <label><span class="label">Typ konta</span><select class="small-control account-type" id="newType"><option>Aktywne</option><option>Pasywne</option><option>Aktywno-pasywne</option><option>Kosztowe</option><option>Kosztowe kalkulacyjne</option><option>Przychodowe</option><option>Techniczne / rozliczeniowe</option><option>Wynik finansowy</option></select></label>
+    <label><span class="label">Saldo początkowe</span><input class="small-control" id="newOpening" value="0,00" inputmode="decimal" /></label>
+    <label><span class="label">Strona salda początkowego</span><select class="small-control opening-side" id="newOpeningSide"><option value="W">Wn</option><option value="M">Ma</option></select><div class="opening-note" id="newOpeningNote"></div></label>
+  </div><div class="modal-actions"><button type="button" id="cancelAccountDialog" class="secondary">Anuluj</button><button type="button" class="primary" id="createAccountBtn">Utwórz konto</button></div></form></dialog>
+
+  <dialog id="entryDialog"><form method="dialog" class="modal" id="entryForm"><div class="modal-head"><h2 id="entryModalTitle">Dodaj zapis</h2><button type="button" id="closeEntryDialog" class="modal-close" aria-label="Zamknij">×</button></div><div class="form-grid">
+    <label><span class="label">Strona konta</span><select class="small-control" id="entrySide"><option value="W">Wn (Debet)</option><option value="M">Ma (Kredyt)</option></select></label>
+    <label><span class="label">Numer operacji</span><input class="small-control" id="entryOperationNumber" required placeholder="np. 9, 9a lub 9b" /></label>
+    <label class="wide"><span class="label">Opis operacji</span><input class="small-control" id="entryDescription" required placeholder="np. Zakup materiałów" /></label>
+    <label class="wide"><span class="label">Kwota</span><input class="small-control" id="entryAmount" required inputmode="decimal" placeholder="0,00" /></label>
+  </div><div class="modal-actions"><button type="button" id="cancelEntryDialog" class="secondary">Anuluj</button><button type="button" class="primary" id="saveEntryBtn">Zapisz</button></div></form></dialog>
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+    let state={konta:[]}, selectedAccountId=null, editingEntryId=null, currentView='dashboard';
+    const $=id=>document.getElementById(id);
+    const money=(value,currency='PLN')=>new Intl.NumberFormat('pl-PL',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(value||0))+' '+currency;
+    const shortMoney=value=>new Intl.NumberFormat('pl-PL',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(value||0));
+    const esc=value=>String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    const icon=name=>`<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+    async function api(path,method='GET',body=null){const r=await fetch(path,{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):null});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Nie udało się wykonać operacji.');return d}
+    function toast(message,error=false){const el=$('toast');el.textContent=message;el.className='toast'+(error?' error':'');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add('hidden'),3000)}
+    function account(){return state.konta.find(k=>k.id===selectedAccountId)||null}
+    async function refresh(){state=await api('/api/state');if(selectedAccountId&&!account())showDashboard();renderDashboard();if(account())renderAccount();if(currentView==='ris')renderRis()}
+    function setActiveNav(view){}
+    function showDashboard(){currentView='dashboard';selectedAccountId=null;$('dashboardView').classList.remove('hidden');$('risView').classList.add('hidden');$('accountView').classList.add('hidden');history.replaceState(null,'','#konta');setActiveNav('dashboard');renderDashboard()}
+    function showRis(){currentView='ris';selectedAccountId=null;$('dashboardView').classList.add('hidden');$('accountView').classList.add('hidden');$('risView').classList.remove('hidden');history.replaceState(null,'','#rzis');setActiveNav('ris');renderRis();scrollTo({top:0,behavior:'smooth'})}
+    function openAccount(id){currentView='account';selectedAccountId=id;$('dashboardView').classList.add('hidden');$('risView').classList.add('hidden');$('accountView').classList.remove('hidden');history.replaceState(null,'',`#konto-${id}`);setActiveNav('dashboard');renderAccount();scrollTo({top:0,behavior:'smooth'})}
+    function filteredAccounts(){const query=$('globalSearch').value.trim().toLowerCase();return state.konta.filter(k=>!query||k.nazwa.toLowerCase().includes(query)||k.numer.toLowerCase().includes(query))}
+    const normalSide={Aktywne:'W',Pasywne:'M',Kosztowe:'W','Kosztowe kalkulacyjne':'W',Przychodowe:'M'};
+    function normalSideFor(k){return normalSide[k.typ]||k.strona_salda_poczatkowego||'W'}
+    function entryTone(k,side){return k.typ==='Wynik finansowy'?'neutralny':(normalSideFor(k)===side?'zwiekszenie':'zmniejszenie')}
+    function operationChecksHtml(){const ops=state.operacje||[];if(!ops.length)return '<p class="meta">Dodaj pozycje, aby sprawdzić operacje.</p>';return ops.map(o=>o.status==='zgodna'?`<div class="operation-check"><strong>Operacja ${esc(o.numer)}</strong><span class="status ok">Zgodna: Wn = Ma · ${shortMoney(o.suma_wn)} PLN</span></div>`:`<div class="operation-check"><strong>Operacja ${esc(o.numer)}</strong><span class="status problem">Brakuje ${shortMoney(o.roznica)} PLN po stronie ${o.brakujaca_strona}</span></div>`).join('')}
+    function renderDashboard(){
+      const ops=state.operacje||[], matched=ops.filter(o=>o.status==='zgodna').length, open=ops.length-matched, closed=state.konta.filter(k=>k.zamkniete).length;
+      $('metricAll').textContent=state.konta.length;$('metricMatched').textContent=matched;$('metricOpen').textContent=open;$('metricClosed').textContent=closed;$('metricOpen').classList.toggle('decrease',open>0);$('metricOpen').classList.toggle('increase',open===0);$('metricClosed').classList.toggle('increase',closed>0);$('operationChecks').innerHTML=operationChecksHtml();
+      const grid=$('accountsGrid');grid.innerHTML='';const items=filteredAccounts();if(!items.length)grid.innerHTML='<div class="empty">Nie znaleziono kont spełniających wybrane kryteria.</div>';
+      items.forEach(k=>{const side=k.strona_salda||'—',saldoTone=k.ton_salda||'neutralny',status=k.zamkniete?'<span class="badge closed">Zamknięte</span>':`<span class="badge ${k.typ==='Kosztowe'||k.typ==='Przychodowe'?'result':''}">${esc(k.typ)}</span>`,entries=[...k.zapisy].sort((a,b)=>a.id-b.id),rows=entries.length?entries.map(z=>`<div class="entry-preview-row" title="${esc(z.opis)||'Bez opisu'}"><span>${esc(z.numer_operacji)}</span><span class="entry-preview-side ${entryTone(k,z.strona)}">${esc(z.strona)}</span><span>${esc(z.opis)||'—'}</span><span class="entry-preview-amount">${shortMoney(z.kwota)}</span></div>`).join(''):'<div class="entry-preview-empty">Brak zapisów</div>';const card=document.createElement('article');card.className='account-card';card.innerHTML=`<button class="account-open" aria-label="Otwórz konto ${esc(k.numer)} ${esc(k.nazwa)}"><div class="account-head"><span class="account-number">${esc(k.numer)}</span><span class="account-name">${esc(k.nazwa)}</span>${status}</div><div class="account-sums"><div class="sum-cell"><span class="sum-label">Wn</span><span class="sum-value ${entryTone(k,'W')}">${shortMoney(k.suma_winien)}</span></div><div class="sum-cell"><span class="sum-label">Ma</span><span class="sum-value ${entryTone(k,'M')}">${shortMoney(k.suma_ma)}</span></div></div><div class="balance-line"><span>Saldo ${side}</span><strong class="${saldoTone}">${shortMoney(Math.abs(Number(k.saldo)))}</strong></div></button><div class="account-entry-preview"><div class="entry-preview-title">Zapisy konta</div><div class="entry-preview-head"><span>Nr</span><span>Str.</span><span>Opis</span><span>Kwota</span></div><div class="account-entries-scroll">${rows}</div></div>`;card.querySelector('.account-open').onclick=()=>openAccount(k.id);grid.appendChild(card)});
+      $('recentAccounts').innerHTML=[...state.konta].slice(-4).reverse().map(k=>`<button class="recent-item" style="width:100%;border:0;background:none;text-align:left" data-account="${k.id}"><span class="recent-number">${esc(k.numer)}</span><span class="recent-name">${esc(k.nazwa)}</span><span class="recent-type">${esc(k.typ)}</span></button>`).join('');document.querySelectorAll('[data-account]').forEach(btn=>btn.onclick=()=>openAccount(Number(btn.dataset.account)));
+    }
+    function renderRis(){const wynikowe=state.konta.filter(k=>k.typ==='Kosztowe'||k.typ==='Przychodowe'),zamkniete=wynikowe.filter(k=>k.zamkniete).length;$('risClosed').textContent=`${zamkniete} z ${wynikowe.length} kont wynikowych zamkniętych`;$('risList').innerHTML=wynikowe.length?wynikowe.map(k=>{const check=k.zamkniecie||{},ready=k.zamkniete;return `<button class="ris-row" data-ris-account="${k.id}" style="width:100%;border:0;background:transparent;text-align:left"><strong>${esc(k.numer)}</strong><span>${esc(k.nazwa)} <small>(${esc(k.typ)})</small><br><small>${esc(check.opis||'')}</small></span><span class="ris-state ${ready?'ready':'waiting'}">${ready?'Zamknięte':'Do zamknięcia'}</span></button>`}).join(''):'<p class="meta">Dodaj konto kosztowe lub przychodowe.</p>';document.querySelectorAll('[data-ris-account]').forEach(btn=>btn.onclick=()=>openAccount(Number(btn.dataset.risAccount)))}
+    const ledgerHead='<div class="ledger-head"><span></span><span>Nr operacji</span><span>Opis operacji</span><span>Kwota</span><span></span></div>';
+    function renderLedger(side){const k=account(),entries=k.zapisy.filter(z=>z.strona===side),container=side==='W'?$('debitLedger'):$('creditLedger'),tone=entryTone(k,side);let html=ledgerHead;entries.forEach(z=>html+=`<div class="ledger-row ${tone}"><span><input class="ledger-check" type="checkbox" data-entry="${z.id}"></span><span>${esc(z.numer_operacji)}</span><span title="${esc(z.opis)}">${esc(z.opis)||'—'}</span><span>${shortMoney(z.kwota)}</span><button class="row-edit" data-edit-entry="${z.id}" title="Edytuj">${icon('pencil')}</button></div>`);for(let i=entries.length;i<Math.max(9,entries.length);i++)html+=`<div class="ledger-row empty-row"><span></span><span></span><span></span><span></span><span></span></div>`;html+=`<div class="ledger-total ${tone}"><span>Razem ${side==='W'?'Wn':'Ma'}:</span><span>${money(side==='W'?k.suma_winien:k.suma_ma)}</span></div>`;container.innerHTML=html}
+    function syncOpening(typeId,sideId,openingId,noteId){const type=$(typeId).value,side=$(sideId),opening=$(openingId),note=$(noteId),normal=normalSide[type];side.disabled=Boolean(normal);if(normal)side.value=normal;if(type==='Kosztowe'||type==='Kosztowe kalkulacyjne'||type==='Przychodowe'||type==='Wynik finansowy'){opening.value='0,00';opening.disabled=true;note.textContent=type==='Wynik finansowy'?'Konto 860 zaczyna ćwiczenie od 0,00 i zbiera wynik po zamknięciu kont wynikowych.':type==='Kosztowe kalkulacyjne'?'Konto kosztów kalkulacyjnych (np. 501, 522, 552) zaczyna ćwiczenie od 0,00; nie jest automatycznie zamykane przez program.':'Konto wynikowe zaczyna ćwiczenie od 0,00.'}else{opening.disabled=false;note.textContent=type==='Techniczne / rozliczeniowe'?'Dla konta technicznego (np. 490) strona salda może zależeć od zadania; wybierz ją samodzielnie.':normal?`Saldo początkowe tego konta wpisuje się po stronie ${normal==='W'?'Wn':'Ma'}.`:'Wybierz stronę typową: tam zwiększenia są zielone, a po przeciwnej stronie zmniejszenia są czerwone.'}}
+    function renderAccount(){const k=account();if(!k)return;$('detailName').textContent=k.nazwa;$('detailMeta').textContent=`Numer konta: ${k.numer}   |   Typ: ${k.typ}   |   Saldo ${k.strona_salda||'0'}: ${money(Math.abs(Number(k.saldo)))}${k.zamkniete?'   |   Konto zamknięte':''}`;$('detailSaldo').textContent=`${k.strona_salda||'—'}  ${money(Math.abs(Number(k.saldo)))}`;$('detailSaldo').className=`saldo-pill ${k.ton_salda}`;$('propName').value=k.nazwa;$('propNumber').value=k.numer;$('propType').value=k.typ;$('propOpening').value=String(k.saldo_poczatkowe).replace('.',',');$('propOpeningSide').value=k.strona_salda_poczatkowego;syncOpening('propType','propOpeningSide','propOpening','propOpeningNote');renderLedger('W');renderLedger('M');$('operationChecksDetail').innerHTML=operationChecksHtml();
+      document.querySelectorAll('[data-edit-entry]').forEach(btn=>btn.onclick=()=>openEntryDialog(Number(btn.dataset.editEntry)));
+      $('recentEntries').innerHTML=k.zapisy.slice(-5).reverse().map(z=>`<div class="recent-entry ${entryTone(k,z.strona)}"><span>nr ${esc(z.numer_operacji)}</span><span title="${esc(z.opis)}">${esc(z.opis)||'—'}</span><span class="side-tag">${z.strona==='W'?'Wn':'Ma'}</span><span class="amount">${shortMoney(z.kwota)}</span></div>`).join('')||'<p class="meta">Brak zapisów.</p>';
+    }
+    function suggestedOperationNumber(){let highest=0;state.konta.flatMap(k=>k.zapisy).forEach(z=>{const match=String(z.numer_operacji||'').match(/^(\d+)/);if(match)highest=Math.max(highest,Number(match[1]))});return String(highest+1)}
+    function openEntryDialog(entryId=null){const k=account();editingEntryId=entryId;const z=k?.zapisy.find(x=>x.id===entryId);$('entryModalTitle').textContent=z?'Edytuj zapis':'Dodaj zapis';$('entrySide').value=z?.strona||'W';$('entryOperationNumber').value=z?.numer_operacji||suggestedOperationNumber();$('entryDescription').value=z?.opis||'';$('entryAmount').value=z?String(z.kwota).replace('.',','):'';$('entryDialog').showModal()}
+    document.querySelectorAll('.new-account').forEach(btn=>btn.onclick=()=>{$('accountForm').reset();$('newOpening').value='0,00';syncOpening('newType','newOpeningSide','newOpening','newOpeningNote');$('accountDialog').showModal()});
+    $('closeAccountDialog').onclick=$('cancelAccountDialog').onclick=()=>$('accountDialog').close();
+    $('closeEntryDialog').onclick=$('cancelEntryDialog').onclick=()=>$('entryDialog').close();
+    $('accountForm').onsubmit=e=>{e.preventDefault();$('createAccountBtn').click()};
+    $('entryForm').onsubmit=e=>{e.preventDefault();$('saveEntryBtn').click()};
+    $('createAccountBtn').onclick=async e=>{e.preventDefault();try{const created=await api('/api/accounts','POST',{name:$('newName').value,number:$('newNumber').value,type:$('newType').value,openingBalance:$('newOpening').value,openingSide:$('newOpeningSide').value});$('accountDialog').close();await refresh();openAccount(created.id);toast('Konto zostało utworzone.')}catch(err){toast(err.message,true)}};
+    $('saveEntryBtn').onclick=async e=>{e.preventDefault();const k=account();try{const payload={side:$('entrySide').value,operationNumber:$('entryOperationNumber').value,description:$('entryDescription').value,amount:$('entryAmount').value};await api(`/api/accounts/${k.id}/entries${editingEntryId?'/'+editingEntryId:''}`,editingEntryId?'PUT':'POST',payload);$('entryDialog').close();await refresh();const op=(state.operacje||[]).find(item=>item.numer===payload.operationNumber.toLowerCase());toast(op?.status==='zgodna'?'Operacja jest zbilansowana.':'Pozycja zapisana — sprawdź kontrolę operacji.')}catch(err){toast(err.message,true)}};
+    $('saveAccountBtn').onclick=async()=>{const k=account();try{await api(`/api/accounts/${k.id}`,'PUT',{name:$('propName').value,number:$('propNumber').value,type:$('propType').value,openingBalance:$('propOpening').value,openingSide:$('propOpeningSide').value});await refresh();toast('Zmiany na koncie zostały zapisane.')}catch(err){toast(err.message,true)}};
+    $('deleteSelectedBtn').onclick=async()=>{const ids=[...document.querySelectorAll('.ledger-check:checked')].map(x=>Number(x.dataset.entry));if(!ids.length){toast('Najpierw zaznacz zapisy do usunięcia.',true);return}if(!confirm(`Usunąć zaznaczone zapisy (${ids.length})?`))return;for(const id of ids)await api(`/api/accounts/${account().id}/entries/${id}`,'DELETE');await refresh();toast('Zaznaczone zapisy zostały usunięte.')};
+    $('deleteAccountBtn').onclick=async()=>{const k=account();if(!confirm(`Usunąć konto ${k.numer} — ${k.nazwa}?`))return;await api(`/api/accounts/${k.id}`,'DELETE');await refresh();showDashboard();toast('Konto zostało usunięte.')};
+    $('resetAllBtn').onclick=async()=>{if(!confirm('Usunąć wszystkie konta i wszystkie zapisy z bieżącego ćwiczenia? Tej operacji nie można cofnąć, ale przed czyszczeniem możesz wyeksportować XLSX.'))return;try{await api('/api/accounts','DELETE');selectedAccountId=null;await refresh();showDashboard();toast('Ćwiczenie zostało wyczyszczone — możesz utworzyć własne konta.')}catch(err){toast(err.message,true)}};
+    $('globalSearch').oninput=()=>{if(selectedAccountId)showDashboard();renderDashboard()};
+    $('backBtn').onclick=showDashboard;$('addEntryBtn').onclick=()=>openEntryDialog();$('showAllEntries').onclick=()=>document.querySelector('.ledger').scrollIntoView({behavior:'smooth'});
+    document.querySelectorAll('.coming').forEach(btn=>btn.onclick=()=>toast('Ta sekcja jest przygotowana wizualnie i będzie rozwijana w kolejnym etapie.'));
+    $('exportBtn').onclick=async()=>{try{const response=await fetch('/api/export/xlsx');if(!response.ok)throw new Error('Nie udało się przygotować pliku.');const url=URL.createObjectURL(await response.blob());const a=document.createElement('a');a.href=url;a.download='t-konta.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Arkusz XLSX z kontami T został przygotowany.')}catch(err){toast(err.message,true)}};
+    $('newType').onchange=()=>syncOpening('newType','newOpeningSide','newOpening','newOpeningNote');$('propType').onchange=()=>syncOpening('propType','propOpeningSide','propOpening','propOpeningNote');
+    $('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const bytes=new Uint8Array(await file.arrayBuffer());let binary='';bytes.forEach(byte=>binary+=String.fromCharCode(byte));await api('/api/import/xlsx','POST',{file:btoa(binary)});selectedAccountId=null;await refresh();toast('Ćwiczenie zostało odtworzone z pliku XLSX.')}catch(err){toast('Import nie powiódł się: '+err.message,true)}e.target.value=''};
+    window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('globalSearch').focus()}});
+    const initialHash=location.hash;
+    refresh().then(()=>{const match=initialHash.match(/konto-(\d+)/);if(match&&state.konta.some(k=>k.id===Number(match[1])))openAccount(Number(match[1]));else if(initialHash==='#rzis')showRis();else showDashboard()}).catch(err=>toast(err.message,true));
+  </script>
+</body>
+</html>
