@@ -29,6 +29,62 @@ z treścią ćwiczenia.
 
 **Dane działają w pamięci bieżącego uruchomienia, dlatego pracę należy zachować przez eksport XLSX, a później odtworzyć przez import.**
 
+## Uruchomienie od zera — Windows 10 i Windows 11
+
+Poniższa instrukcja jest dla osoby bez Pythona, Git-a, Visual Studio Code i doświadczenia technicznego. Wystarczy komputer z Windows, przeglądarka i około 5 minut.
+
+### Co będzie potrzebne
+
+- połączenie z Internetem — tylko do pierwszego pobrania programu i Pythona;
+- przeglądarka, np. Chrome, Edge albo Firefox.
+
+T-konta działają lokalnie na komputerze. Nie trzeba zakładać konta, instalować Excel-a ani pobierać dodatkowych bibliotek Pythona. Nie używa się też poleceń `pip install`.
+
+### Krok 1 — pobierz program z GitHub
+
+1. Otwórz <https://github.com/DawidDrawcPG/T-Konta>.
+2. Kliknij zielony przycisk **Code**, a następnie **Download ZIP**.
+3. Otwórz folder **Pobrane** i znajdź plik `T-Konta-main.zip`.
+4. Kliknij go prawym przyciskiem myszy, wybierz **Wyodrębnij wszystko...**, a potem **Wyodrębnij**.
+5. Powstanie folder `T-Konta-main`.
+
+> **Nie uruchamiaj programu bezpośrednio z pliku ZIP. Najpierw zawsze go wypakuj.**
+
+### Krok 2 — zainstaluj Python (tylko jeden raz)
+
+1. Otwórz oficjalną stronę <https://www.python.org/downloads/windows/>.
+2. Pobierz najnowszy **Python 3** dla Windows i uruchom instalator.
+3. W pierwszym oknie instalatora zaznacz pole **Add python.exe to PATH**.
+4. Kliknij **Install Now**, poczekaj na zakończenie instalacji i zamknij instalator.
+
+To jedyna instalacja wymagana do pracy z programem.
+
+### Krok 3 — uruchom T-konta
+
+1. Otwórz wypakowany folder `T-Konta-main`.
+2. Kliknij pasek adresu Eksploratora plików u góry okna, tam gdzie widać ścieżkę folderu.
+3. Wpisz dokładnie `cmd` i naciśnij **Enter**.
+4. Otworzy się czarne okno z białym tekstem. Wpisz w nim:
+
+   ```text
+   py app.py
+   ```
+
+5. Naciśnij **Enter**. Gdy pojawi się adres `http://localhost:8000`, program działa prawidłowo.
+6. Nie zamykaj czarnego okna podczas pracy w T-kontach.
+7. Otwórz przeglądarkę, wpisz w pasku adresu `http://localhost:8000` i naciśnij **Enter**.
+
+Pojawi się pusty pulpit. Kliknij **Nowe konto T**, aby utworzyć konto potrzebne w ćwiczeniu. Student sam wpisuje nazwę, numer i rodzaj konta oraz zapisy Wn i Ma.
+
+### Zapisanie pracy i zamknięcie programu
+
+1. Kliknij w programie **Eksportuj do XLSX**.
+2. Przeglądarka pobierze plik z ćwiczeniem. Zapamiętaj, gdzie został zapisany.
+3. Wróć do czarnego okna i naciśnij jednocześnie **Ctrl + C**.
+4. Zamknij czarne okno i przeglądarkę.
+
+Przy kolejnym uruchomieniu pulpit będzie pusty. Aby kontynuować pracę, uruchom program ponownie, kliknij **Importuj ćwiczenie XLSX** i wybierz wcześniej wyeksportowany plik.
+
 ---
 
 ## Uruchomienie na iPadzie i innych tabletach
@@ -109,63 +165,6 @@ Aby wrócić do wcześniejszego ćwiczenia:
 - Jeśli Codespaces pokazuje komunikat o limicie, budżecie albo problemie z płatnością, należy sprawdzić ustawienia **Settings → Billing and licensing** na koncie GitHub.
 
 ---
-
-## Uruchomienie od zera — Windows 10 i Windows 11
-
-Poniższa instrukcja jest dla osoby bez Pythona, Git-a, Visual Studio Code i doświadczenia technicznego. Wystarczy komputer z Windows, przeglądarka i około 5 minut.
-
-### Co będzie potrzebne
-
-- połączenie z Internetem — tylko do pierwszego pobrania programu i Pythona;
-- przeglądarka, np. Chrome, Edge albo Firefox.
-
-T-konta działają lokalnie na komputerze. Nie trzeba zakładać konta, instalować Excel-a ani pobierać dodatkowych bibliotek Pythona. Nie używa się też poleceń `pip install`.
-
-### Krok 1 — pobierz program z GitHub
-
-1. Otwórz <https://github.com/DawidDrawcPG/T-Konta>.
-2. Kliknij zielony przycisk **Code**, a następnie **Download ZIP**.
-3. Otwórz folder **Pobrane** i znajdź plik `T-Konta-main.zip`.
-4. Kliknij go prawym przyciskiem myszy, wybierz **Wyodrębnij wszystko...**, a potem **Wyodrębnij**.
-5. Powstanie folder `T-Konta-main`.
-
-> **Nie uruchamiaj programu bezpośrednio z pliku ZIP. Najpierw zawsze go wypakuj.**
-
-### Krok 2 — zainstaluj Python (tylko jeden raz)
-
-1. Otwórz oficjalną stronę <https://www.python.org/downloads/windows/>.
-2. Pobierz najnowszy **Python 3** dla Windows i uruchom instalator.
-3. W pierwszym oknie instalatora zaznacz pole **Add python.exe to PATH**.
-4. Kliknij **Install Now**, poczekaj na zakończenie instalacji i zamknij instalator.
-
-To jedyna instalacja wymagana do pracy z programem.
-
-### Krok 3 — uruchom T-konta
-
-1. Otwórz wypakowany folder `T-Konta-main`.
-2. Kliknij pasek adresu Eksploratora plików u góry okna, tam gdzie widać ścieżkę folderu.
-3. Wpisz dokładnie `cmd` i naciśnij **Enter**.
-4. Otworzy się czarne okno z białym tekstem. Wpisz w nim:
-
-   ```text
-   py app.py
-   ```
-
-5. Naciśnij **Enter**. Gdy pojawi się adres `http://localhost:8000`, program działa prawidłowo.
-6. Nie zamykaj czarnego okna podczas pracy w T-kontach.
-7. Otwórz przeglądarkę, wpisz w pasku adresu `http://localhost:8000` i naciśnij **Enter**.
-
-Pojawi się pusty pulpit. Kliknij **Nowe konto T**, aby utworzyć konto potrzebne w ćwiczeniu. Student sam wpisuje nazwę, numer i rodzaj konta oraz zapisy Wn i Ma.
-
-### Zapisanie pracy i zamknięcie programu
-
-1. Kliknij w programie **Eksportuj do XLSX**.
-2. Przeglądarka pobierze plik z ćwiczeniem. Zapamiętaj, gdzie został zapisany.
-3. Wróć do czarnego okna i naciśnij jednocześnie **Ctrl + C**.
-4. Zamknij czarne okno i przeglądarkę.
-
-Przy kolejnym uruchomieniu pulpit będzie pusty. Aby kontynuować pracę, uruchom program ponownie, kliknij **Importuj ćwiczenie XLSX** i wybierz wcześniej wyeksportowany plik.
-
 ### Najczęstsze problemy
 
 | Co widzę? | Co zrobić? |
